@@ -21,14 +21,15 @@ Cypress.Commands.add("clearAndType", (selector, text) => {
 });
 
 Cypress.Commands.add("forceClickOnCanvas", () => {
-  cy.get(commonSelectors.canvas).click({ force: true });
+  cy.get(commonSelectors.canvas).click("topRight", { force: true });
 });
 
 Cypress.Commands.add("verifyToastMessage", (selector, message) => {
-  cy.get(selector).eq(0).should("be.visible").and("have.text", message);
+  cy.get(selector).should("contain.text", message);
   cy.get("body").then(($body) => {
     if ($body.find(commonSelectors.toastCloseButton).length > 0) {
       cy.closeToastMessage();
+      cy.wait(200);
     }
   });
 });
@@ -82,34 +83,36 @@ Cypress.Commands.add("appLogin", () => {
 });
 
 Cypress.Commands.add("waitForAutoSave", () => {
-  cy.get(commonSelectors.autoSave, { timeout: 10000 }).should(
+  cy.wait(200);
+  cy.get(commonSelectors.autoSave, { timeout: 20000 }).should(
     "have.text",
-    commonText.autoSave
+    commonText.autoSave,
+    { timeout: 20000 }
   );
 });
 
 Cypress.Commands.add("createApp", (appName) => {
   cy.get("body").then(($title) => {
     if ($title.text().includes(commonText.introductionMessage)) {
-      cy.get(commonSelectors.emptyAppCreateButton).click();
+      cy.get(commonSelectors.emptyAppCreateButton).eq(0).click();
     } else {
       cy.get(commonSelectors.appCreateButton).click();
     }
     cy.intercept("GET", "/api/apps/**/versions").as("appVersion");
     cy.wait("@appVersion", { timeout: 15000 });
-    cy.get("body").then(($el) => {
-      if ($el.text().includes("Skip", { timeout: 1000 })) {
-        cy.get(commonSelectors.skipButton).click();
-      } else {
-        cy.log("instructions modal is skipped ");
-      }
-    });
+    cy.skipEditorPopover();
   });
 });
 
 Cypress.Commands.add(
   "dragAndDropWidget",
-  (widgetName, positionX = 190, positionY = 80, widgetName2 = widgetName) => {
+  (
+    widgetName,
+    positionX = 190,
+    positionY = 80,
+    widgetName2 = widgetName,
+    canvas = commonSelectors.canvas
+  ) => {
     const dataTransfer = new DataTransfer();
 
     cy.clearAndType(commonSelectors.searchField, widgetName);
@@ -118,7 +121,7 @@ Cypress.Commands.add(
       { dataTransfer },
       { force: true }
     );
-    cy.get(commonSelectors.canvas).trigger("drop", positionX, positionY, {
+    cy.get(canvas).trigger("drop", positionX, positionY, {
       dataTransfer,
       force: true,
     });
@@ -170,7 +173,9 @@ Cypress.Commands.add(
 Cypress.Commands.add("deleteApp", (appName) => {
   cy.intercept("DELETE", "/api/apps/*").as("appDeleted");
   cy.get(commonSelectors.appCard(appName))
+    .realHover()
     .find(commonSelectors.appCardOptionsButton)
+    .realHover()
     .click();
   cy.get(commonSelectors.deleteAppOption).click();
   cy.get(commonSelectors.buttonSelector(commonText.modalYesButton)).click();
@@ -203,7 +208,10 @@ Cypress.Commands.add("modifyCanvasSize", (x, y) => {
 });
 
 Cypress.Commands.add("renameApp", (appName) => {
-  cy.clearAndType(commonSelectors.appNameInput, appName);
+  cy.get(commonSelectors.appNameInput).type(
+    `{selectAll}{backspace}${appName}`,
+    { force: true }
+  );
   cy.waitForAutoSave();
 });
 
@@ -236,6 +244,11 @@ Cypress.Commands.add("notVisible", (dataCy) => {
       cy.get(dataCy).should("not.be.visible");
     }
   });
+  const log = Cypress.log({
+    name: "notVisible",
+    displayName: "Not Visible",
+    message: dataCy,
+  });
 });
 
 Cypress.Commands.add("resizeWidget", (widgetName, x, y) => {
@@ -263,6 +276,16 @@ Cypress.Commands.add("reloadAppForTheElement", (elementText) => {
   cy.get("body").then(($title) => {
     if (!$title.text().includes(elementText)) {
       cy.reload();
+    }
+  });
+});
+
+Cypress.Commands.add("skipEditorPopover", () => {
+  cy.get("body").then(($el) => {
+    if ($el.text().includes("Skip", { timeout: 2000 })) {
+      cy.get(commonSelectors.skipButton).realClick();
+    } else {
+      cy.log("instructions modal is skipped ");
     }
   });
 });

@@ -13,7 +13,7 @@ export const CreateRow = React.memo(({ currentState, optionchanged, options, dar
   useEffect(() => {
     mounted && optionchanged('create_row', columnOptions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnOptions, optionchanged]);
+  }, [columnOptions]);
 
   function handleColumnOptionChange(columnOptions) {
     setColumnOptions(columnOptions);
@@ -88,6 +88,7 @@ export const CreateRow = React.memo(({ currentState, optionchanged, options, dar
               value={column}
               options={displayColumns}
               onChange={handleColumnChange}
+              customWrap={true}
             />
           </div>
 

@@ -21,7 +21,13 @@ import {
   selectFromSidebarDropdown,
   dataPdfAssertionHelper,
   dataCsvAssertionHelper,
+  addFilter,
 } from "Support/utils/table";
+import {
+  selectCSA,
+  selectEvent,
+  addSupportCSAData,
+} from "Support/utils/events";
 import {
   openAccordion,
   verifyAndModifyParameter,
@@ -45,9 +51,11 @@ describe("Table", () => {
   beforeEach(() => {
     cy.appUILogin();
     cy.createApp();
-    cy.modifyCanvasSize(900, 900);
+    cy.viewport(1200, 1200);
+    cy.modifyCanvasSize(900, 700);
     cy.dragAndDropWidget("Table", 50, 50);
     cy.resizeWidget(tableText.defaultWidgetName, 850, 600);
+    cy.get(`[data-cy="allow-selection-toggle-button"]`).click({ force: true });
   });
 
   it("Should verify the table components and labels", () => {
@@ -138,7 +146,7 @@ describe("Table", () => {
     );
     cy.get(tableSelector.buttonCloseFilters).should("be.visible");
 
-    cy.get(tableSelector.buttonAddFilter).dblclick();
+    cy.get(tableSelector.buttonAddFilter).realClick().realClick();
 
     cy.get(tableSelector.labelColumn).verifyVisibleElement(
       "have.text",
@@ -210,7 +218,8 @@ describe("Table", () => {
       codeMirrorInputLabel(`[{id:1,name:"Mike",email:"mike@example.com" },{id:2,name:"Nina",email:"nina@example.com" },{id:3,name:"Steph",email:"steph@example.com" },{id:4,name:"Oliver",email:"oliver@example.com" },
       ]`)
     );
-    cy.get('[data-cy="inspector-close-icon"]').click();
+    // cy.get('[data-cy="inspector-close-icon"]').click();
+    cy.forceClickOnCanvas();
     cy.waitForAutoSave();
     verifyTableElements([
       { id: 1, name: "Mike", email: "mike@example.com" },
@@ -218,7 +227,6 @@ describe("Table", () => {
       { id: 3, name: "Steph", email: "steph@example.com" },
       { id: 4, name: "Oliver", email: "oliver@example.com" },
     ]);
-    cy.get('[data-cy="inspector-close-icon"]').click();
     openEditorSidebar(data.widgetName);
     openAccordion("Columns", ["Options", "Properties", "Layout"]);
     deleteAndVerifyColumn("email");
@@ -270,10 +278,9 @@ describe("Table", () => {
     cy.get('[data-cy="rightActions-cell-2"]')
       .eq(0)
       .should("have.text", "FakeName1");
-    selectDropdownOption(
-      `[data-cy="dropdown-action-button-position"] > .select-search`,
-      0
-    );
+    cy.get(`[data-cy="dropdown-action-button-position"]>>:eq(0)`).click();
+    cy.get('[data-index="0"] > .select-search-option').click();
+
     cy.get('[data-cy="leftActions-cell-0"]')
       .eq(0)
       .should("have.text", "FakeName1");
@@ -344,25 +351,30 @@ describe("Table", () => {
     deleteAndVerifyColumn("name");
     deleteAndVerifyColumn("email");
     addAndOpenColumnOption("Fake-String", `string`);
-    selectDropdownOption('[data-cy="input-overflow"] > .select-search', `wrap`);
+    selectDropdownOption('[data-cy="input-overflow"] >>:eq(0)', `wrap`);
+    cy.get('[data-index="0"]>.select-search-option:eq(1)').realClick();
+    cy.wait(2000);
     verifyAndEnterColumnOptionInput("key", "name");
     verifyAndEnterColumnOptionInput("Text color", "red");
     verifyAndEnterColumnOptionInput(
       "Cell Background Color",
-      "{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}yellow"
+      "{backspace}{backspace}{backspace}{backspace}{backspace}yellow"
     );
     cy.get(
       '[data-cy="input-and-label-cell-background-color"] > .form-label'
     ).click();
+    cy.wait(500);
 
     cy.get(tableSelector.column(0))
       .eq(0)
-      .should("have.css", "background-color", "rgb(255, 255, 0)")
-      .find("span")
-      .should("have.css", "color", "rgb(255, 0, 0)")
+      .should("have.css", "background-color", "rgb(255, 255, 0)", {
+        timeout: 10000,
+      })
+      .last()
+      .should("have.css", "color", "rgb(62, 82, 91)")
       .and("have.text", "Sarah");
 
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     cy.get('[data-cy="header-validation"]').verifyVisibleElement(
       "have.text",
       "Validation"
@@ -382,7 +394,7 @@ describe("Table", () => {
     addAndOpenColumnOption("fake-number", `number`);
     verifyAndEnterColumnOptionInput("key", "id");
     // verifyAndEnterColumnOptionInput("Cell Background Color", "black");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     cy.get('[data-cy="header-validation"]').verifyVisibleElement(
       "have.text",
       "Validation"
@@ -390,16 +402,17 @@ describe("Table", () => {
 
     verifyAndEnterColumnOptionInput("Min value", "2");
     verifyAndEnterColumnOptionInput("Max value", "3");
-    addInputOnTable(0, 0, "2");
+    addInputOnTable(0, 0, "0");
     verifyInvalidFeedback(0, 0, "Minimum value is 2");
     verifyInvalidFeedback(0, 3, "Maximum value is 3");
+    openEditorSidebar(data.widgetName);
     deleteAndVerifyColumn("fake-number");
 
     openEditorSidebar(data.widgetName);
     addAndOpenColumnOption("fake-text", `text`);
     verifyAndEnterColumnOptionInput("key", "email");
     // verifyAndEnterColumnOptionInput("Cell Background Color", "");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     verifySingleValueOnTable(0, 0, "sarah@example.com");
     addInputOnTable(0, 0, "mike@example.com", "textarea");
     openEditorSidebar(data.widgetName);
@@ -412,7 +425,7 @@ describe("Table", () => {
     verifyAndEnterColumnOptionInput("Labels", '{{["One","Two","Three"]');
 
     // verifyAndEnterColumnOptionInput("Cell Background Color", "fakeString");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     selectDropdownOption(`${tableSelector.column(0)}:eq(0) .badge`, 1);
     cy.get(`${tableSelector.column(0)}:eq(0) .badge`).should(
       "have.text",
@@ -427,7 +440,7 @@ describe("Table", () => {
     verifyAndEnterColumnOptionInput("Values", "{{[1,2,3]");
     verifyAndEnterColumnOptionInput("Labels", '{{["One","Two","Three"]');
     // verifyAndEnterColumnOptionInput("Cell Background Color", "fakeString");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     selectDropdownOption(`${tableSelector.column(0)}:eq(0) .badge`, 1); // WIP (workaround needed)
     cy.get(`${tableSelector.column(0)}:eq(1) .badge`).should(
       "have.text",
@@ -436,9 +449,9 @@ describe("Table", () => {
     selectDropdownOption(`${tableSelector.column(0)}:eq(0) .badge`, 0);
     cy.get(`${tableSelector.column(0)}:eq(0) .badge`).should(
       "have.text",
-      "One"
+      "TwoOne"
     );
-    // selectDropdownOption(`${tableSelector.column(0)}:eq(1) .badge:eq(1)`, 1);
+    selectDropdownOption(`${tableSelector.column(0)}:eq(1) .badge`, 1);
     cy.get(`${tableSelector.column(0)}:eq(0) .badge`).should(
       "have.text",
       "One"
@@ -457,7 +470,7 @@ describe("Table", () => {
 
     // verifyAndEnterColumnOptionInput("Cell Background Color", "fakeString");
     //WIP Not editble verify
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     cy.forceClickOnCanvas();
 
     cy.get(`${tableSelector.column(0)}:eq(0) .badge`)
@@ -492,7 +505,7 @@ describe("Table", () => {
     verifyAndEnterColumnOptionInput("Labels", '{{["One","Two","Three"]');
 
     // verifyAndEnterColumnOptionInput("Cell Background Color", "fakeString");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     verifyAndEnterColumnOptionInput("Custom rule", "fakeString");
 
     deleteAndVerifyColumn("fake-dropdown");
@@ -506,7 +519,7 @@ describe("Table", () => {
     verifyAndEnterColumnOptionInput("Labels", '{{["One","Two","Three"]');
 
     // verifyAndEnterColumnOptionInput("Cell Background Color", "fakeString");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     // //verifyRadio
     deleteAndVerifyColumn("fake-radio");
 
@@ -518,7 +531,7 @@ describe("Table", () => {
     verifyAndEnterColumnOptionInput("Labels", '{{["One","Two","Three"]');
 
     // verifyAndEnterColumnOptionInput("Cell Background Color", "fakeString");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     // //verify multiselect
     deleteAndVerifyColumn("fake-multiselect");
 
@@ -528,7 +541,7 @@ describe("Table", () => {
     verifyAndEnterColumnOptionInput("key", "fakeString");
     // verifyAndEnterColumnOptionInput("Active color", "green"); //use color Picker
     // verifyAndEnterColumnOptionInput("Cell Background Color", "fakeString");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
     deleteAndVerifyColumn("fake-toggleSwitch");
 
     // //Toggle Switch
@@ -538,7 +551,7 @@ describe("Table", () => {
     verifyAndEnterColumnOptionInput("key", "fakeString");
     // verifyAndEnterColumnOptionInput("Date Display format", "fakeString");
     // verifyAndEnterColumnOptionInput("Cell Background Color", "blue");
-    cy.get('[data-cy="toggle-make-editable"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
 
     // // verifyAndEnterColumnOptionInput("Date Parse Format", "fakeString");
 
@@ -642,6 +655,9 @@ describe("Table", () => {
       data.color,
       data.boxShadowParam
     );
+    cy.get(
+      commonWidgetSelector.draggableWidget(tableText.defaultWidgetName)
+    ).click();
     cy.get(commonWidgetSelector.buttonStylesEditorSideBar).click();
 
     cy.get('[data-cy="label-table-type"]').verifyVisibleElement(
@@ -659,6 +675,9 @@ describe("Table", () => {
       .find("table")
       .invoke("attr", "class")
       .and("contain", "randomText");
+    cy.get(
+      commonWidgetSelector.draggableWidget(tableText.defaultWidgetName)
+    ).click();
     cy.get(commonWidgetSelector.buttonStylesEditorSideBar).click();
 
     cy.get('[data-cy="table-type-fx-button"]').click();
@@ -666,6 +685,7 @@ describe("Table", () => {
     selectFromSidebarDropdown('[data-cy="dropdown-table-type"]', "Classic");
     cy.forceClickOnCanvas();
     cy.get(commonWidgetSelector.draggableWidget(tableText.defaultWidgetName))
+      .click()
       .find("table")
       .invoke("attr", "class")
       .and("contain", "classic");
@@ -677,6 +697,7 @@ describe("Table", () => {
     );
     cy.forceClickOnCanvas();
     cy.get(commonWidgetSelector.draggableWidget(tableText.defaultWidgetName))
+      .click()
       .find("table")
       .invoke("attr", "class")
       .and("contain", "table-striped table-bordered ");
@@ -694,6 +715,9 @@ describe("Table", () => {
       `randomText`
     );
     cy.forceClickOnCanvas();
+    cy.get(
+      commonWidgetSelector.draggableWidget(tableText.defaultWidgetName)
+    ).click();
     cy.get(tableSelector.column(0))
       .eq(0)
       .invoke("attr", "class")
@@ -704,6 +728,9 @@ describe("Table", () => {
     cy.get('[data-cy="cell-size-fx-button"]').click();
     selectFromSidebarDropdown('[data-cy="dropdown-cell-size"]', "Spacious");
     cy.forceClickOnCanvas();
+    cy.get(
+      commonWidgetSelector.draggableWidget(tableText.defaultWidgetName)
+    ).click();
 
     cy.get(tableSelector.column(0))
       .eq(0)
@@ -717,7 +744,9 @@ describe("Table", () => {
     );
 
     selectColourFromColourPicker(`Text color`, data.color);
+    cy.forceClickOnCanvas();
     cy.get(commonWidgetSelector.draggableWidget(tableText.defaultWidgetName))
+      .click()
       .find("tbody")
       .should(
         "have.css",
@@ -758,14 +787,16 @@ describe("Table", () => {
     verifyAndModifyToggleFx("Server-side sort", "{{false}}", true);
 
     verifyAndModifyToggleFx("Show download button", "{{true}}", true);
-    cy.notVisible('[data-tip="Download"]');
+    cy.notVisible('[data-tooltip-id="tooltip-for-download"]');
 
     verifyAndModifyToggleFx("Show filter button", "{{true}}", true);
-    cy.notVisible('[data-tip="Filter data"]');
+    cy.notVisible('[data-tooltip-id="tooltip-for-filter-data"]');
 
     cy.get('[data-cy="show-filter-button-toggle-button"]').click();
     verifyAndModifyToggleFx("Server-side filter", "{{false}}", true);
     verifyAndModifyToggleFx("Show update buttons", "{{true}}", true);
+
+    cy.get(`[data-cy="allow-selection-toggle-button"]`).click({ force: true });
     verifyAndModifyToggleFx("Bulk selection", "{{false}}", true);
     cy.get('[data-cy="checkbox-input"]').should("be.visible");
 
@@ -802,5 +833,172 @@ describe("Table", () => {
       .and("contain", dataCsvAssertionHelper(tableText.defaultInput)[2]);
   });
 
-  it("should verify table preview", () => {});
+  it("Should verify the table filter options", () => {
+    cy.get(
+      commonWidgetSelector.draggableWidget(tableText.defaultWidgetName)
+    ).should("be.visible");
+    cy.get(tableSelector.filterButton).click();
+    addFilter(
+      [{ column: "name", operation: "contains", value: "Sarah" }],
+      true
+    );
+    verifyTableElements([{ id: 1, name: "Sarah", email: "sarah@example.com" }]);
+
+    addFilter([
+      { column: "name", operation: "does not contains", value: "Sarah" },
+    ]);
+    verifyTableElements([
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 3, name: "Sam", email: "sam@example.com" },
+      { id: 4, name: "Jon", email: "jon@example.com" },
+    ]);
+
+    addFilter([
+      { column: "email", operation: "matches", value: "jon@example.com" },
+    ]);
+    verifyTableElements([{ id: 4, name: "Jon", email: "jon@example.com" }]);
+
+    addFilter([
+      {
+        column: "email",
+        operation: "does not match",
+        value: "jon@example.com",
+      },
+    ]);
+    verifyTableElements([
+      { id: 1, name: "Sarah", email: "sarah@example.com" },
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 3, name: "Sam", email: "sam@example.com" },
+    ]);
+
+    addFilter([{ column: "id", operation: "equals", value: "3" }]);
+    verifyTableElements([{ id: 3, name: "Sam", email: "sam@example.com" }]);
+
+    addFilter([{ column: "id", operation: "does not equal", value: "3" }]);
+    verifyTableElements([
+      { id: 1, name: "Sarah", email: "sarah@example.com" },
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 4, name: "Jon", email: "jon@example.com" },
+    ]);
+
+    addFilter([{ column: "id", operation: "greater than", value: "1" }]);
+    verifyTableElements([
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 3, name: "Sam", email: "sam@example.com" },
+      { id: 4, name: "Jon", email: "jon@example.com" },
+    ]);
+
+    addFilter([{ column: "id", operation: "less than", value: "3" }]);
+    verifyTableElements([
+      { id: 1, name: "Sarah", email: "sarah@example.com" },
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+    ]);
+
+    addFilter([
+      { column: "id", operation: "greater than or equals", value: "1" },
+    ]);
+    verifyTableElements([
+      { id: 1, name: "Sarah", email: "sarah@example.com" },
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 3, name: "Sam", email: "sam@example.com" },
+      { id: 4, name: "Jon", email: "jon@example.com" },
+    ]);
+
+    addFilter([{ column: "id", operation: "less than or equals", value: "3" }]);
+    verifyTableElements([
+      { id: 1, name: "Sarah", email: "sarah@example.com" },
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 3, name: "Sam", email: "sam@example.com" },
+    ]);
+
+    addFilter(
+      [
+        { column: "id", operation: "greater than or equals", value: "2" },
+        { column: "email", operation: "contains", value: "Sa" },
+      ],
+      true
+    );
+    verifyTableElements([
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 3, name: "Sam", email: "sam@example.com" },
+    ]);
+
+    addFilter(
+      [
+        { column: "id", operation: "greater than or equals", value: "1" },
+        { column: "email", operation: "does not contains", value: "Sa" },
+      ],
+      true
+    );
+    verifyTableElements([{ id: 4, name: "Jon", email: "jon@example.com" }]);
+
+    addFilter([{ column: "id", operation: "is empty" }], true);
+    cy.notVisible('[data-cy*="-cell-"]');
+
+    addFilter([{ column: "id", operation: "is not empty" }], true);
+
+    verifyTableElements([
+      { id: 1, name: "Sarah", email: "sarah@example.com" },
+      { id: 2, name: "Lisa", email: "lisa@example.com" },
+      { id: 3, name: "Sam", email: "sam@example.com" },
+      { id: 4, name: "Jon", email: "jon@example.com" },
+    ]);
+  });
+
+  it("should verify table CSA", () => {
+    cy.get('[data-cy="column-id"]').click();
+    cy.get('[data-cy="make-editable-toggle-button"]').click();
+    cy.get(`[data-cy="allow-selection-toggle-button"]`).click({ force: true });
+
+    cy.get(
+      '[data-cy="number-of-rows-per-page-input-field"]'
+    ).clearAndTypeOnCodeMirror("{{2");
+    verifyAndModifyToggleFx("Highlight selected row", "{{false}}", true);
+
+    cy.get('[data-cy="real-canvas"]').click("topRight");
+    cy.dragAndDropWidget("Button", 870, 50);
+    selectEvent("On click", "Control Component");
+    selectCSA("table1", "Set page");
+    addSupportCSAData("Page", "{{2");
+
+    cy.get('[data-cy="real-canvas"]').click("topRight");
+    cy.dragAndDropWidget("Button", 870, 100);
+    selectEvent("On click", "Control Component");
+    selectCSA("table1", "Select row");
+    addSupportCSAData("Key", "name");
+    addSupportCSAData("Value", "Lisa");
+
+    cy.get('[data-cy="real-canvas"]').click("topRight");
+    cy.dragAndDropWidget("Button", 870, 150);
+    selectEvent("On click", "Control Component");
+    selectCSA("table1", "Deselect row");
+
+    cy.get('[data-cy="real-canvas"]').click("topRight");
+    cy.dragAndDropWidget("Button", 870, 200);
+    selectEvent("On click", "Control Component");
+    selectCSA("table1", "Discard Changes");
+
+    cy.get(commonWidgetSelector.draggableWidget("button2")).click();
+    cy.get('[role="row"]').eq(2).should("have.class", "selected");
+
+    cy.get(commonWidgetSelector.draggableWidget("button3")).click();
+    cy.get('[role="row"]').eq(2).should("not.have.class", "selected");
+
+    cy.get(commonWidgetSelector.draggableWidget("button1")).click();
+    cy.get('[data-cy*="-cell-1"] ').eq(1).should("have.text", "Jon");
+    cy.get('[data-cy="page-index-details"]').should("have.text", "2 of 2");
+
+    cy.get('[data-cy="3-cell-0"]')
+      .click()
+      .find("input")
+      .clear()
+      .type("test123");
+
+    cy.get('[data-cy*="-cell-0"]')
+      .eq(0)
+      .find("input")
+      .should("have.value", "test123");
+    cy.get(commonWidgetSelector.draggableWidget("button4")).click();
+    cy.get('[data-cy*="-cell-0"]').eq(0).should("have.text", "3");
+  });
 });

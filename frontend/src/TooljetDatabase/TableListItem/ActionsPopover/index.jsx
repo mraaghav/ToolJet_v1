@@ -5,14 +5,14 @@ import Popover from 'react-bootstrap/Popover';
 import EditIcon from './Icons/Edit.svg';
 // import CloneIcon from './Icons/Clone.svg';
 import DeleteIcon from './Icons/Delete.svg';
-import EllipsisIcon from './Icons/Ellipsis.svg';
+import SolidIcon from '@/_ui/Icon/SolidIcons';
 
 export const ListItemPopover = ({ onEdit, onDelete, darkMode }) => {
   const [open, setOpen] = React.useState(false);
 
   const popover = (
-    <Popover id="popover-contained" className="table-list-items">
-      <Popover.Content className={`${darkMode && 'theme-dark'}`}>
+    <Popover id="popover-contained" className={`table-list-items ${darkMode && 'dark-theme'}`}>
+      <Popover.Body className={`${darkMode && 'theme-dark'}`}>
         <div className={`row cursor-pointer`}>
           <div className="col-auto" data-cy="edit-option-icon">
             <EditIcon />
@@ -42,13 +42,13 @@ export const ListItemPopover = ({ onEdit, onDelete, darkMode }) => {
             Delete
           </div>
         </div>
-      </Popover.Content>
+      </Popover.Body>
     </Popover>
   );
 
   return (
     <div
-      className={cx(`float-right cursor-pointer table-list-item-popover ${darkMode && 'dark'}`, {
+      className={cx(`float-right cursor-pointer table-list-item-popover`, {
         'd-grid': open,
       })}
       data-cy="table-kebab-icon"
@@ -62,8 +62,11 @@ export const ListItemPopover = ({ onEdit, onDelete, darkMode }) => {
         trigger="click"
         placement="bottom"
         overlay={popover}
+        transition={false}
       >
-        <EllipsisIcon />
+        <span>
+          <SolidIcon name="morevertical" width="14" fill={darkMode ? '#FDFDFE' : '#11181C'} />
+        </span>
       </OverlayTrigger>
     </div>
   );

@@ -45,6 +45,7 @@ import { VerticalDivider } from './Components/verticalDivider';
 import { PDF } from './Components/PDF';
 import { ColorPicker } from './Components/ColorPicker';
 import { KanbanBoard } from './Components/KanbanBoard/KanbanBoard';
+import { Kanban } from './Components/Kanban/Kanban';
 import { Steps } from './Components/Steps';
 import { TreeSelect } from './Components/TreeSelect';
 import { Icon } from './Components/Icon';
@@ -112,6 +113,7 @@ const AllComponents = {
   PDF,
   ColorPicker,
   KanbanBoard,
+  Kanban,
   Steps,
   TreeSelect,
   Link,
@@ -143,7 +145,6 @@ export const Box = function Box({
   customResolvables,
   parentId,
   sideBarDebugger,
-  dataQueries,
   readOnly,
   childComponents,
 }) {
@@ -280,7 +281,11 @@ export const Box = function Box({
       }
     >
       <div
-        style={{ ...styles, backgroundColor, boxShadow: validatedGeneralStyles?.boxShadow }}
+        style={{
+          ...styles,
+          backgroundColor,
+          boxShadow: validatedGeneralStyles?.boxShadow,
+        }}
         role={preview ? 'BoxPreview' : 'Box'}
       >
         {inCanvas ? (
@@ -331,7 +336,6 @@ export const Box = function Box({
               validate={validate}
               parentId={parentId}
               customResolvables={customResolvables}
-              dataQueries={dataQueries}
               variablesExposedForPreview={variablesExposedForPreview}
               exposeToCodeHinter={exposeToCodeHinter}
               setProperty={(property, value) => {

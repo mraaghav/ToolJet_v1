@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import Fuse from 'fuse.js';
-import { LeftSidebarItem } from '../SidebarItem';
 import { Button, HeaderSection } from '@/_ui/LeftSidebar';
 import { PageHandler, AddingPageHandler } from './PageHandler';
 import { GlobalSettings } from './GlobalSettings';
 import _ from 'lodash';
 import SortableList from '@/_components/SortableList';
-import Popover from '@/_ui/Popover';
 // eslint-disable-next-line import/no-unresolved
 import EmptyIllustration from '@assets/images/no-results.svg';
 
 const LeftSidebarPageSelector = ({
   appDefinition,
-  selectedSidebarItem,
-  setSelectedSidebarItem,
   darkMode,
   currentPageId,
   addNewPage,
@@ -32,11 +28,14 @@ const LeftSidebarPageSelector = ({
   updateOnPageLoadEvents,
   currentState,
   apps,
-  dataQueries,
+  pinned,
+  setPinned,
   popoverContentHeight,
+  isVersionReleased,
+  setReleasedVersionPopupState,
 }) => {
   const [allpages, setPages] = useState(pages);
-  const [pinned, setPinned] = useState(false);
+  const [haveUserPinned, setHaveUserPinned] = useState(false);
 
   const [newPageBeingCreated, setNewPageBeingCreated] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -61,9 +60,15 @@ const LeftSidebarPageSelector = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify({ pages })]);
 
-  const popoverContent = (
+  const pinPagesPopover = (state) => {
+    if (!haveUserPinned) {
+      setPinned(state);
+    }
+  };
+
+  return (
     <div>
-      <div className="card-body p-0 pb-5" onClick={(event) => event.stopPropagation()}>
+      <div className="card-body p-0 pb-5">
         <HeaderSection darkMode={darkMode}>
           <HeaderSection.PanelHeader
             title="Pages"
@@ -72,13 +77,21 @@ const LeftSidebarPageSelector = ({
                 darkMode={darkMode}
                 showHideViewerNavigationControls={showHideViewerNavigationControls}
                 showPageViwerPageNavitation={appDefinition?.showViewerNavigation || false}
+                isVersionReleased={isVersionReleased}
+                setReleasedVersionPopupState={setReleasedVersionPopupState}
               />
             }
           >
             <div className="d-flex justify-content-end">
               <Button
                 title={'Add Page'}
-                onClick={() => setNewPageBeingCreated(true)}
+                onClick={() => {
+                  if (isVersionReleased) {
+                    setReleasedVersionPopupState();
+                    return;
+                  }
+                  setNewPageBeingCreated(true);
+                }}
                 darkMode={darkMode}
                 size="sm"
                 styles={{ width: '28px', padding: 0 }}
@@ -96,7 +109,10 @@ const LeftSidebarPageSelector = ({
               </Button>
               <Button
                 title={`${pinned ? 'Unpin' : 'Pin'}`}
-                onClick={() => setPinned(!pinned)}
+                onClick={() => {
+                  setPinned(!pinned);
+                  !haveUserPinned && setHaveUserPinned(true);
+                }}
                 darkMode={darkMode}
                 size="sm"
                 styles={{ width: '28px', padding: 0 }}
@@ -119,7 +135,7 @@ const LeftSidebarPageSelector = ({
           )}
         </HeaderSection>
 
-        <div className={`${darkMode && 'dark'} page-selector-panel-body`}>
+        <div className={`${darkMode && 'dark theme-dark'} page-selector-panel-body`}>
           <div>
             {allpages.length > 0 ? (
               <SortableList
@@ -144,7 +160,10 @@ const LeftSidebarPageSelector = ({
                 apps={apps}
                 allpages={pages}
                 components={appDefinition?.components ?? {}}
-                dataQueries={dataQueries}
+                isVersionReleased={isVersionReleased}
+                setReleasedVersionPopupState={setReleasedVersionPopupState}
+                pinPagesPopover={pinPagesPopover}
+                haveUserPinned={haveUserPinned}
               />
             ) : (
               <div className="d-flex justify-content-center align-items-center" style={{ height: '100%' }}>
@@ -171,27 +190,6 @@ const LeftSidebarPageSelector = ({
         </div>
       </div>
     </div>
-  );
-
-  return (
-    <Popover
-      handleToggle={(open) => {
-        if (!open) setSelectedSidebarItem('');
-      }}
-      {...(pinned && { open: true })}
-      popoverContentClassName="p-0 sidebar-h-100-popover"
-      side="right"
-      popoverContent={popoverContent}
-      popoverContentHeight={popoverContentHeight}
-    >
-      <LeftSidebarItem
-        selectedSidebarItem={selectedSidebarItem}
-        onClick={() => setSelectedSidebarItem('page')}
-        icon="page"
-        className={`left-sidebar-item left-sidebar-layout left-sidebar-page-selector`}
-        tip="Pages"
-      />
-    </Popover>
   );
 };
 

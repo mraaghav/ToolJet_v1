@@ -4,13 +4,15 @@ export const cyParamName = (paramName = "") => {
 
 export const commonSelectors = {
   toastMessage: ".go3958317564",
+  oldToastMessage: ".go318386747",
+  newToastMessage:
+    '.drawer-container > [style="position: fixed; z-index: 9999; inset: 16px; pointer-events: none;"] > .go4109123758 > .go2072408551',
   toastCloseButton: '[data-cy="toast-close-button"]',
   editButton: "[data-cy=edit-button]",
   searchField: "[data-cy=widget-search-box]",
   firstWidget: "[data-cy=widget-list]:eq(0)",
   canvas: "[data-cy=real-canvas]",
   appCardOptionsButton: "[data-cy=app-card-menu-icon]",
-  folderCardOptions: "[data-cy=folder-card-menu-icon]",
   autoSave: "[data-cy=autosave-indicator]",
   skipButton: ".driver-close-btn",
   skipInstallationModal: "[data-cy=skip-button]",
@@ -26,14 +28,12 @@ export const commonSelectors = {
   loginButton: '[data-cy="login-button"]',
   dropdown: "[data-cy=workspace-dropdown]",
   backButton: "[data-cy=left-sidebar-back-button]",
-  emptyAppCreateButton: "[data-cy=create-new-application]",
+  dashboardAppCreateButton: '[data-cy="button-new-app-from-scratch"]',
   appCreateButton: "[data-cy=create-new-app-button]",
   createButton: "[data-cy=create-button]",
   appNameInput: "[data-cy=app-name-input]",
   launchButton: "[data-cy=launch-button]",
   folderNameInput: "[data-cy=folder-name-input]",
-  deleteFolderOption: "[data-cy=delete-folder-card-option]",
-  editFolderOption: "[data-cy=edit-folder-card-option]",
   deleteAppOption: "[data-cy=delete-app-card-option]",
   cancelButton: "[data-cy=cancel-button]",
   modalComponent: "[data-cy=modal-component]",
@@ -41,7 +41,7 @@ export const commonSelectors = {
   createNewFolderButton: "[data-cy=create-new-folder-button]",
   folderNameInput: "[data-cy=folder-name-input]",
   createFolderButton: "[data-cy=create-folder-button]",
-  folderList: ".css-2kg7t4-MenuList",
+  folderList: ".react-select__menu-list",
   empytyFolderImage: "[data-cy=empty-folder-image]",
   emptyFolderText: "[data-cy=empty-folder-text]",
   allApplicationsLink: "[data-cy=all-applications-link]",
@@ -55,9 +55,7 @@ export const commonSelectors = {
   viewerPageLogo: '[data-cy="viewer-page-logo"]',
   lastPageArrow: '[data-cy="last-page-link"]',
   nextPageArrow: '[data-cy="next-page-link"]',
-  emailFilterInput: '[data-cy="email-filter-input-field"]',
-  firstNameFilterInput: '[data-cy="first-name-filter-input-field"]',
-  lastNameFilterInput: '[data-cy="last-name-filter-input-field"]',
+  inputUserSearch: '[data-cy="input-field-user-filter-search"]',
   filterButton: '[data-cy="filter-button"]',
   copyIcon: '[data-cy="copy-icon"]',
   addWorkspaceButton: '[data-cy="add-new-workspace-link"]',
@@ -81,12 +79,13 @@ export const commonSelectors = {
   invitedUserName: '[data-cy="invited-user-name"]',
   invitedUserEmail: '[data-cy="invited-user-email"]',
   acceptInviteButton: '[data-cy="accept-invite-button"]',
+  databaseIcon: '[data-cy="icon-database"]',
   profileSettings: '[data-cy="profile-settings"]',
-  workspaceSettingsIcon: '[data-cy="workspace-settings-icon"]',
-  manageUsersOption: '[data-cy="manage-users-option"]',
-  manageGroupsOption: '[data-cy="manage-groups-option"]',
-  manageSSOOption: '[data-cy="manage-sso-option"]',
-  workspaceVariableOption: '[data-cy="workspace-variable-option"]',
+  workspaceSettingsIcon: '[data-cy="icon-workspace-settings"]',
+  manageUsersOption: '[data-cy="users-list-item"]',
+  manageGroupsOption: '[data-cy="groups-list-item"]',
+  manageSSOOption: '[data-cy="sso-list-item"]',
+  workspaceVariableOption: '[data-cy="workspace-variables-list-item"]',
   clearFilterButton: '[data-cy="clear-filter-button"]',
   userStatusSelect: '[data-cy="user-status-select-continer"]',
   emailInputLabel: '[data-cy="email-input-label"]',
@@ -96,8 +95,8 @@ export const commonSelectors = {
   enableToggleLabel: '[data-cy="enable-toggle-label"]',
   enableToggle: '[data-cy="enable-toggle"]',
   mainWrapper: '[data-cy="main-wrapper"]',
-  workspaceEditButton: '[data-cy="edit-workspace-button"]',
-  dashboardIcon: '[data-cy="dashboard-icon"]',
+  editRectangleIcon: '[data-cy="edit-rectangle-icon"]',
+  dashboardIcon: '[data-cy="icon-dashboard"]',
   notificationsIcon: '[data-cy="notifications-icon"]',
   notificationsCard: '[data-cy="notifications-card"]',
   notificationsCardTitle: '[data-cy="notifications-card-title"]',
@@ -157,6 +156,16 @@ export const commonSelectors = {
   resetPasswordButton: '[data-cy="reset-password-button"]',
   resetPasswordPageDescription: '[data-cy="reset-password-page-description"]',
   backToLoginButton: '[data-cy="back-to-login-button"]',
+  breadcrumbTitle: '[data-cy="app-header-label"]>>',
+  breadcrumbPageTitle: '[data-cy="breadcrumb-page-title"]',
+  labelFullNameInput: '[data-cy="label-full-name-input-field"]',
+  inputFieldFullName: '[data-cy="input-field-full-name"]',
+  labelEmailInput: '[data-cy="label-email-input-field"]',
+  inputFieldEmailAddress: '[data-cy="input-field-email"]',
+  closeButton: '[data-cy="close-button"]',
+  emptyAppCreateButton: "[data-cy='button-new-app-from-scratch']",
+  globalDataSourceIcon: '[data-cy="icon-global-datasources"]',
+  addNewDataSourceButton: '[data-cy="add-new-data-source-button"]',
 
   onboardingRadioButton: (radioButtonText) => {
     return `[data-cy="${cyParamName(radioButtonText)}-radio-button"]`;
@@ -168,6 +177,7 @@ export const commonSelectors = {
   currentWorkspaceName: (workspaceName) => {
     return `[data-cy="${cyParamName(workspaceName)}-current-workspace-name"]`;
   },
+  appHeaderLable: '[data-cy="app-header-label"]',
 
   folderListcard: (folderName) => {
     return `[data-cy="${cyParamName(folderName)}-list-card"]`;
@@ -190,6 +200,16 @@ export const commonSelectors = {
   },
   buttonSelector: (buttonText) => {
     return `[data-cy="${cyParamName(buttonText)}-button"]`;
+  },
+
+  folderCardOptions: (folderName) => {
+    return `[data-cy="${cyParamName(folderName)}-card-menu-icon"]`;
+  },
+  deleteFolderOption: (folderName) => {
+    return `[data-cy="${cyParamName(folderName)}-delete-folder-option"]`;
+  },
+  editFolderOption: (folderName) => {
+    return `[data-cy="${cyParamName(folderName)}-edit-folder-option"]`;
   },
 };
 
@@ -271,7 +291,7 @@ export const commonWidgetSelector = {
     '[data-cy="action-options-action-selection-field"]',
   componentTextInput: '[data-cy="action-options-text-input-field"]',
   changeLayoutButton: "[data-cy= 'change-layout-button']",
-  changeLayoutToMobileButton:  '[data-cy="button-change-layout-to-mobile"]',
+  changeLayoutToMobileButton: '[data-cy="button-change-layout-to-mobile"]',
   changeLayoutToDesktopButton: '[data-cy="button-change-layout-to-desktop"]',
 
   sidebarinspector: "[data-cy='left-sidebar-inspect-button']",
@@ -287,4 +307,19 @@ export const commonWidgetSelector = {
   boxShadowColorPicker: "[data-cy='box-shadow-picker']",
   textInputWidget: '[data-cy="draggable-widget-textinput1"]',
   previewButton: `[data-cy="preview-link-button"]`,
+
+  shareAppButton: '[data-cy="share-button-link"]',
+  shareModalElements: {
+    modalHeader: '[data-cy="modal-header"]',
+    makePublicAppToggleLabel: '[data-cy="make-public-app-label"]',
+    shareableAppLink: '[data-cy="shareable-app-link-label"]',
+    copyAppLinkButton: '[data-cy="copy-app-link-button"]',
+    iframeLinkLabel: '[data-cy="iframe-link-label"]',
+    ifameLinkCopyButton: '[data-cy="iframe-link-copy-button"]',
+  },
+  makePublicAppToggle: '[data-cy="make-public-app-toggle"]',
+  appLink: '[data-cy="app-link"]',
+  appNameSlugInput: '[data-cy="app-name-slug-input"]',
+  iframeLink: '[data-cy="iframe-link"]',
+  modalCloseButton: '[data-cy="modal-close-button"]',
 };

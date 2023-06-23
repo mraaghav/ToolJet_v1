@@ -12,8 +12,7 @@ const EditRowDrawer = ({ isCreateRowDrawerOpen, setIsCreateRowDrawerOpen }) => {
     <>
       <button
         onClick={() => setIsCreateRowDrawerOpen(!isCreateRowDrawerOpen)}
-        className="btn border-0 mx-1"
-        style={{ backgroundColor: '#F0F4FF', color: '#F0F4FF', fontWeight: 500, fontSize: 12 }}
+        className={`edit-row-btn border-0 ghost-black-operation ${isCreateRowDrawerOpen && 'open'}`}
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -23,7 +22,10 @@ const EditRowDrawer = ({ isCreateRowDrawerOpen, setIsCreateRowDrawerOpen }) => {
             fill="#3E63DD"
           />
         </svg>
-        &nbsp;&nbsp;<span className="color-primary">Edit row</span>
+        &nbsp;&nbsp;
+        <span data-cy="edit-row-button-text" className="tj-text-xsm font-weight-500">
+          Edit row
+        </span>
       </button>
       <Drawer isOpen={isCreateRowDrawerOpen} onClose={() => setIsCreateRowDrawerOpen(false)} position="right">
         <EditRowForm

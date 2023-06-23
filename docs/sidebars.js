@@ -25,6 +25,7 @@ const sidebars = {
         'setup/heroku',
         'setup/ec2',
         'setup/ecs',
+        'setup/openshift',
         'setup/kubernetes',
         'setup/kubernetes-gke',
         'setup/kubernetes-aks',
@@ -37,6 +38,7 @@ const sidebars = {
       ]
     },
     'tooljet-database',
+    'tooljet-copilot',
     {
       'type': 'category',
       'label': 'Datasource Catalog',
@@ -62,6 +64,7 @@ const sidebars = {
             'data-sources/gcs',
             'data-sources/google.sheets',
             'data-sources/graphql',
+            'data-sources/grpc',
             'data-sources/influxdb',
             'data-sources/mailgun',
             'data-sources/mariadb',
@@ -103,6 +106,7 @@ const sidebars = {
           'type': 'category',
           'label': 'Components library',
           'items': [
+            'widgets/bounded-box',
             'widgets/button',
             'widgets/button-group',
             'widgets/calendar',
@@ -259,8 +263,8 @@ const sidebars = {
           'type': 'category',
           'label': 'Workspaces',
           'items': [
-            'tutorial/multiworkspace',
-            'tutorial/workspace-environment-variables',
+            'tutorial/workspace_overview',
+            'tutorial/workspace-variables',
           ],
         },
         'org-management/permissions',
@@ -278,7 +282,35 @@ const sidebars = {
         'tutorial/versioning-and-release',
       ],
     },
-    'marketplace',
+    {
+      'type': 'category',
+      'label': 'Marketplace',
+      'link': {
+        'type': 'generated-index',
+        'title': 'Marketplace',
+        //        'description': 'ToolJet Marketplace documentation',
+        'keywords': [
+          'Marketplace',
+          'Marketplace for plugins',
+          'Using Marketplace',
+          'Build plugins for marketplace',
+        ],
+      },
+      'collapsed': true,
+      'items': [
+        'marketplace/marketplace-overview',
+        {
+          'type': 'category',
+          'label': 'Marketplace Plugins',
+          'items': [
+            'marketplace/plugins/marketplace-plugin-textract',
+            'marketplace/plugins/marketplace-plugin-github',
+            'marketplace/plugins/marketplace-plugin-openai',
+            'marketplace/plugins/marketplace-plugin-plivo',
+          ],
+        },
+      ],
+    },
     {
       'type': 'category',
       'label': 'How To',
@@ -298,9 +330,13 @@ const sidebars = {
         'how-to/access-currentuser',
         'how-to/use-axios-in-runjs',
         'how-to/import-external-libraries-using-runpy',
+        'how-to/import-external-libraries-using-runjs',
         'how-to/run-actions-from-runjs',
+        'how-to/intentionally-fail-js-query',
         'how-to/run-query-at-specified-intervals',
+        'how-to/use-to-py-function-in-runpy',
         'how-to/access-users-location',
+        'how-to/use-s3-signed-url-to-upload-docs',
         'how-to/s3-custom-endpoints',
         'how-to/oauth2-authorization',
         'how-to/upload-files-aws',
@@ -334,12 +370,13 @@ const sidebars = {
         },
         {
           'type': 'category',
-          'label': 'Tutorials',
+          'label': 'Marketplace',
           'items': [
-            'contributing-guide/tutorials/creating-widget',
-            'contributing-guide/tutorials/creating-a-plugin',
+            'contributing-guide/marketplace/marketplace-setup',
+            'contributing-guide/marketplace/creating-a-plugin',
           ],
         },
+        'tooljet-cli',
         'contributing-guide/testing',
         'contributing-guide/l10n',
         {
@@ -347,6 +384,7 @@ const sidebars = {
           'label': 'Troubleshooting',
           'items': [
             'contributing-guide/troubleshooting/eslint',
+            'contributing-guide/troubleshooting/runpy-limitations',
           ],
         },
         'contributing-guide/code-of-conduct',

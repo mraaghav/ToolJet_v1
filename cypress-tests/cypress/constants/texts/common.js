@@ -6,6 +6,7 @@ export const path = {
   loginPath: "/login",
   profilePath: "/settings",
   confirmInvite: "/confirm",
+  database: "/database",
 };
 
 export const commonText = {
@@ -13,6 +14,7 @@ export const commonText = {
   email: "dev@tooljet.io",
   password: "password",
   loginErrorToast: "Invalid email or password",
+  welcomeTooljetWorkspace: "Welcome to your new ToolJet workspace",
   introductionMessage:
     "You can get started by creating a new application or by creating an application using a template in ToolJet Library.",
   changeIconOption: "Change Icon",
@@ -31,8 +33,9 @@ export const commonText = {
   modalYesButton: "Yes",
   emptyFolderText: "This folder is empty",
   allApplicationsLink: "All applications",
-  deleteAppModalMessage:
-    "The app and the associated data will be permanently deleted, do you want to continue?",
+  deleteAppModalMessage: (appName) => {
+    return `The app ${appName} and the associated data will be permanently deleted, do you want to continue?`;
+  },
   appDeletedToast: "App deleted successfully.",
   folderDeletedToast: "Folder has been deleted.",
   createNewFolderButton: "+ Create new folder",
@@ -44,8 +47,9 @@ export const commonText = {
   deleteFolderOption: "Delete folder",
   updateFolderTitle: "Update folder",
   updateFolderButton: "Update folder",
-  folderDeleteModalMessage:
-    "Are you sure you want to delete the folder? Apps within the folder will not be deleted.",
+  folderDeleteModalMessage: (folderName) => {
+    `Are you sure you want to delete the folder ${folderName}? Apps within the folder will not be deleted.`;
+  },
   closeButton: "modal close",
   workEmailLabel: "Email",
   emailInputError: "Invalid Email",
@@ -65,6 +69,8 @@ export const commonText = {
     "You are invited to a workspace My workspace. Accept the invite to join the workspace.",
   userNameInputLabel: "Name",
   acceptInviteButton: "Accept invite",
+  createButton: "Create",
+  saveChangesButton: "Save changes",
   emailInputLabel: "Email",
   allApplicationLink: "All apps",
   notificationsCardTitle: "Notifications",
@@ -119,6 +125,15 @@ export const commonText = {
   backToLoginButton: "Back to log in",
   resetPasswordPageDescription:
     "Your password has been reset successfully, log into ToolJet to continue your session",
+  labelFullNameInput: "Enter full name",
+  labelEmailInput: "Email address",
+  breadcrumbworkspaceSettingTitle: "Workspace settings",
+  breadcrumbGlobalDatasourceTitle: "Global datasources",
+  breadcrumbDatabaseTitle: "Databse",
+  breadcrumbApplications: "Applications",
+  breadcrumbSettings: "Settings",
+  addNewDataSourceButton: "Add new datasource",
+
   emailPageDescription: (email) => {
     return `We’ve sent an email to ${email} with a verification link. Please use that to verify your email address.`;
   },
@@ -146,6 +161,15 @@ export const commonText = {
     ThousandPlus: "1000+",
   },
   selfHostSignUpTermsHelperText: "By continuing you are agreeing to the",
+
+  shareModalElements: {
+    modalHeader: "Share",
+    makePublicAppToggleLabel: "Make application public?",
+    shareableAppLink: "Get shareable link for this application",
+    copyAppLinkButton: "copy",
+    iframeLinkLabel: "Get embeddable link for this application",
+    ifameLinkCopyButton: "copy",
+  },
 };
 
 export const commonWidgetText = {
